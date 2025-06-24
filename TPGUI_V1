@@ -1,0 +1,156 @@
+local player = game.Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
+
+local gui = Instance.new("ScreenGui")
+gui.Name = "CustomGUI"
+gui.ResetOnSpawn = false
+gui.Parent = player:WaitForChild("PlayerGui")
+
+local function applyPressEffect(button, baseColor)
+	button.MouseButton1Down:Connect(function()
+		button.BackgroundColor3 = Color3.new(baseColor.R * 0.85, baseColor.G * 0.85, baseColor.B * 0.85)
+	end)
+	button.MouseButton1Up:Connect(function()
+		button.BackgroundColor3 = baseColor
+	end)
+	button.MouseLeave:Connect(function()
+		button.BackgroundColor3 = baseColor
+	end)
+end
+
+local function makeDraggable(guiElement)
+	local dragging = false
+	local dragInput, dragStart, startPos
+
+	guiElement.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1 then
+			dragging = true
+			dragStart = input.Position
+			startPos = guiElement.Position
+
+			input.Changed:Connect(function()
+				if input.UserInputState == Enum.UserInputState.End then
+					dragging = false
+				end
+			end)
+		end
+	end)
+
+	guiElement.InputChanged:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseMovement then
+			dragInput = input
+		end
+	end)
+
+	UserInputService.InputChanged:Connect(function(input)
+		if input == dragInput and dragging then
+			local delta = input.Position - dragStart
+			guiElement.Position = UDim2.new(
+				startPos.X.Scale, startPos.X.Offset + delta.X,
+				startPos.Y.Scale, startPos.Y.Offset + delta.Y
+			)
+		end
+	end)
+end
+
+local menuBtn = Instance.new("TextButton")
+menuBtn.Size = UDim2.new(0, 50, 0, 50)
+menuBtn.Position = UDim2.new(0, 20, 0.5, -25)
+menuBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+menuBtn.Text = "≡"
+menuBtn.Font = Enum.Font.GothamBold
+menuBtn.TextSize = 28
+menuBtn.TextColor3 = Color3.new(1, 1, 1)
+menuBtn.BorderSizePixel = 0
+menuBtn.Parent = gui
+Instance.new("UICorner", menuBtn).CornerRadius = UDim.new(0.5, 0)
+makeDraggable(menuBtn)
+
+local menu1 = Instance.new("Frame")
+menu1.Size = UDim2.new(0, 280, 0, 270)
+menu1.Position = UDim2.new(0, 90, 0.5, -135)
+menu1.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+menu1.Visible = false
+menu1.Parent = gui
+Instance.new("UICorner", menu1).CornerRadius = UDim.new(0.1, 0)
+makeDraggable(menu1)
+
+local destinos = {
+	{"Garden 1", CFrame.new(33.45, 3.00, -57.55)},
+	{"Garden 2", CFrame.new(33.74, 3.00, 33.02)},
+	{"Garden 3", CFrame.new(-100.58, 3.00, 30.12)},
+	{"Garden 4", CFrame.new(-99.62, 3.00, -54.44)},
+	{"Garden 5", CFrame.new(-236.85, 3.00, 26.37)},
+	{"Garden 6", CFrame.new(-235.68, 3.00, -52.87)},
+	{"Pets 🐾", CFrame.new(-278.00, 3.00, 7.58)},
+	{"Gear 🔧", CFrame.new(-283.71, 3.00, -13.79)},
+	{"Cosmetics 🎨", CFrame.new(-283.21, 3.00, -31.21)},
+	{"Event 🏟️", CFrame.new(-104.59, 11.89, -7.05)}
+}
+
+for i, info in ipairs(destinos) do
+	local btn = Instance.new("TextButton")
+	btn.Size = UDim2.new(0, 120, 0, 35)
+	btn.Position = UDim2.new(0, (i <= 5 and 10 or 150), 0, 25 + ((i - 1) % 5) * 42)
+	local color = Color3.fromRGB(255, 105, 180)
+	btn.BackgroundColor3 = color
+	btn.TextColor3 = Color3.new(1, 1, 1)
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 13
+	btn.Text = info[1]
+	btn.BorderSizePixel = 0
+	btn.Parent = menu1
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0.3, 0)
+	applyPressEffect(btn, color)
+
+	btn.MouseButton1Click:Connect(function()
+		local char = player.Character
+		if char and char:FindFirstChild("HumanoidRootPart") then
+			char.HumanoidRootPart.CFrame = info[2]
+		end
+	end)
+end
+
+local menu2 = Instance.new("Frame")
+menu2.Size = UDim2.new(0, 280, 0, 60)
+menu2.Position = UDim2.new(0, 390, 0.5, -135)
+menu2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+menu2.Visible = false
+menu2.Parent = gui
+Instance.new("UICorner", menu2).CornerRadius = UDim.new(0.1, 0)
+makeDraggable(menu2)
+
+local fruitBtn = Instance.new("TextButton")
+fruitBtn.Size = UDim2.new(1, -20, 0, 35)
+fruitBtn.Position = UDim2.new(0, 10, 0, 12)
+local fColor = Color3.fromRGB(255, 150, 0)
+fruitBtn.BackgroundColor3 = fColor
+fruitBtn.TextColor3 = Color3.new(1, 1, 1)
+fruitBtn.Font = Enum.Font.GothamBold
+fruitBtn.TextSize = 14
+fruitBtn.Text = "🍎Give fruit to event🏟️"
+fruitBtn.BorderSizePixel = 0
+fruitBtn.Parent = menu2
+Instance.new("UICorner", fruitBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(fruitBtn, fColor)
+
+-- CORRECCIÓN SOLO AQUÍ
+fruitBtn.MouseButton1Click:Connect(function()
+	local prompt = workspace:FindFirstChild("SummerHarvestProxPrompt", true)
+	if prompt and prompt:IsA("ProximityPrompt") then
+		if typeof(fireproximityprompt) == "function" then
+			fireproximityprompt(prompt)
+		else
+			warn("fireproximityprompt no disponible en este entorno.")
+		end
+	else
+		warn("❌ No se encontró 'SummerHarvestProxPrompt' en ninguna parte.")
+	end
+end)
+
+local visible = false
+menuBtn.MouseButton1Click:Connect(function()
+	visible = not visible
+	menu1.Visible = visible
+	menu2.Visible = visible
+end)
