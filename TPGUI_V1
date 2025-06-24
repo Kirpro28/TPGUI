@@ -112,7 +112,7 @@ for i, info in ipairs(destinos) do
 end
 
 local menu2 = Instance.new("Frame")
-menu2.Size = UDim2.new(0, 280, 0, 60)
+menu2.Size = UDim2.new(0, 280, 0, 110)
 menu2.Position = UDim2.new(0, 390, 0.5, -135)
 menu2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 menu2.Visible = false
@@ -134,7 +134,6 @@ fruitBtn.Parent = menu2
 Instance.new("UICorner", fruitBtn).CornerRadius = UDim.new(0.3, 0)
 applyPressEffect(fruitBtn, fColor)
 
--- CORRECCIÓN SOLO AQUÍ
 fruitBtn.MouseButton1Click:Connect(function()
 	local prompt = workspace:FindFirstChild("SummerHarvestProxPrompt", true)
 	if prompt and prompt:IsA("ProximityPrompt") then
@@ -145,6 +144,41 @@ fruitBtn.MouseButton1Click:Connect(function()
 		end
 	else
 		warn("❌ No se encontró 'SummerHarvestProxPrompt' en ninguna parte.")
+	end
+end)
+
+local honeyBtn = Instance.new("TextButton")
+honeyBtn.Size = UDim2.new(1, -20, 0, 35)
+honeyBtn.Position = UDim2.new(0, 10, 0, 52)
+local hColor = Color3.fromRGB(255, 200, 0)
+honeyBtn.BackgroundColor3 = hColor
+honeyBtn.TextColor3 = Color3.new(1, 1, 1)
+honeyBtn.Font = Enum.Font.GothamBold
+honeyBtn.TextSize = 14
+honeyBtn.Text = "🍯Honey Combpressor"
+honeyBtn.BorderSizePixel = 0
+honeyBtn.Parent = menu2
+Instance.new("UICorner", honeyBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(honeyBtn, hColor)
+
+honeyBtn.MouseButton1Click:Connect(function()
+	-- Busca el primer ProximityPrompt con "Honey" en el nombre
+	local prompt = nil
+	for _, obj in ipairs(workspace:GetDescendants()) do
+		if obj:IsA("ProximityPrompt") and string.find(obj.Name:lower(), "honey") then
+			prompt = obj
+			break
+		end
+	end
+
+	if prompt then
+		if typeof(fireproximityprompt) == "function" then
+			fireproximityprompt(prompt)
+		else
+			warn("fireproximityprompt no disponible en este entorno.")
+		end
+	else
+		warn("❌ No se encontró ningún ProximityPrompt con 'Honey' en el nombre.")
 	end
 end)
 
