@@ -76,12 +76,12 @@ Instance.new("UICorner", menu1).CornerRadius = UDim.new(0.1, 0)
 makeDraggable(menu1)
 
 local destinos = {
-	{"Garden 1", CFrame.new(33.45, 3.00, -57.55)},
-	{"Garden 2", CFrame.new(33.74, 3.00, 33.02)},
-	{"Garden 3", CFrame.new(-100.58, 3.00, 30.12)},
-	{"Garden 4", CFrame.new(-99.62, 3.00, -54.44)},
-	{"Garden 5", CFrame.new(-236.85, 3.00, 26.37)},
-	{"Garden 6", CFrame.new(-235.68, 3.00, -52.87)},
+	{"Garden 1️⃣", CFrame.new(33.45, 3.00, -57.55)},
+	{"Garden 2️⃣", CFrame.new(33.74, 3.00, 33.02)},
+	{"Garden 3️⃣", CFrame.new(-100.58, 3.00, 30.12)},
+	{"Garden 4️⃣", CFrame.new(-99.62, 3.00, -54.44)},
+	{"Garden 5️⃣", CFrame.new(-236.85, 3.00, 26.37)},
+	{"Garden 6️⃣", CFrame.new(-235.68, 3.00, -52.87)},
 	{"Pets 🐾", CFrame.new(-278.00, 3.00, 7.58)},
 	{"Gear 🔧", CFrame.new(-283.71, 3.00, -13.79)},
 	{"Cosmetics 🎨", CFrame.new(-283.21, 3.00, -31.21)},
@@ -120,33 +120,32 @@ menu2.Parent = gui
 Instance.new("UICorner", menu2).CornerRadius = UDim.new(0.1, 0)
 makeDraggable(menu2)
 
-local fruitBtn = Instance.new("TextButton")
-fruitBtn.Size = UDim2.new(1, -20, 0, 35)
-fruitBtn.Position = UDim2.new(0, 10, 0, 12)
-local fColor = Color3.fromRGB(255, 150, 0)
-fruitBtn.BackgroundColor3 = fColor
-fruitBtn.TextColor3 = Color3.new(1, 1, 1)
-fruitBtn.Font = Enum.Font.GothamBold
-fruitBtn.TextSize = 14
-fruitBtn.Text = "🍎Give fruit to event🏟️"
-fruitBtn.BorderSizePixel = 0
-fruitBtn.Parent = menu2
-Instance.new("UICorner", fruitBtn).CornerRadius = UDim.new(0.3, 0)
-applyPressEffect(fruitBtn, fColor)
+local remote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("SummerHarvestRemoteEvent")
 
-fruitBtn.MouseButton1Click:Connect(function()
-	local prompt = workspace:FindFirstChild("SummerHarvestProxPrompt", true)
-	if prompt and prompt:IsA("ProximityPrompt") then
-		if typeof(fireproximityprompt) == "function" then
-			fireproximityprompt(prompt)
-		else
-			warn("fireproximityprompt no disponible en este entorno.")
-		end
+-- Submit All Summer Fruits button
+local submitAllBtn = Instance.new("TextButton")
+submitAllBtn.Size = UDim2.new(1, -20, 0, 35)
+submitAllBtn.Position = UDim2.new(0, 10, 0, 12)
+local btnColor = Color3.fromRGB(255, 150, 0)
+submitAllBtn.BackgroundColor3 = btnColor
+submitAllBtn.TextColor3 = Color3.new(1, 1, 1)
+submitAllBtn.Font = Enum.Font.GothamBold
+submitAllBtn.TextSize = 14
+submitAllBtn.Text = "Submit All Summer Fruits🌴"
+submitAllBtn.BorderSizePixel = 0
+submitAllBtn.Parent = menu2
+Instance.new("UICorner", submitAllBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(submitAllBtn, btnColor)
+
+submitAllBtn.MouseButton1Click:Connect(function()
+	if remote then
+		remote:FireServer("SubmitAllPlants")
 	else
-		warn("❌ No se encontró 'SummerHarvestProxPrompt' en ninguna parte.")
+		warn("No se encontró SummerHarvestRemoteEvent")
 	end
 end)
 
+-- Honey Combpressor button (sin cambios)
 local honeyBtn = Instance.new("TextButton")
 honeyBtn.Size = UDim2.new(1, -20, 0, 35)
 honeyBtn.Position = UDim2.new(0, 10, 0, 52)
