@@ -122,7 +122,7 @@ makeDraggable(menu2)
 
 local remote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("SummerHarvestRemoteEvent")
 
--- Submit All Summer Fruits button
+-- Botón: Submit All Summer Fruits
 local submitAllBtn = Instance.new("TextButton")
 submitAllBtn.Size = UDim2.new(1, -20, 0, 35)
 submitAllBtn.Position = UDim2.new(0, 10, 0, 12)
@@ -145,15 +145,47 @@ submitAllBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Honey Combpressor button (sin cambios)
-local honeyBtn = Instance.new("TextButton")
-honeyBtn.Size = UDim2.new(1, -20, 0, 35)
-honeyBtn.Position = UDim2.new(0, 10, 0, 52)
+-- Botón: Recolectar 🍯 (ProximityPrompt específico)
+local honeyPromptBtn = Instance.new("TextButton")
+honeyPromptBtn.Size = UDim2.new(0.5, -15, 0, 35)
+honeyPromptBtn.Position = UDim2.new(0, 10, 0, 52)
 local hColor = Color3.fromRGB(255, 200, 0)
+honeyPromptBtn.BackgroundColor3 = hColor
+honeyPromptBtn.TextColor3 = Color3.new(1, 1, 1)
+honeyPromptBtn.Font = Enum.Font.GothamBold
+honeyPromptBtn.TextSize = 12
+honeyPromptBtn.Text = "Collect honey🍯"
+honeyPromptBtn.BorderSizePixel = 0
+honeyPromptBtn.Parent = menu2
+Instance.new("UICorner", honeyPromptBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(honeyPromptBtn, hColor)
+
+honeyPromptBtn.MouseButton1Click:Connect(function()
+	local prompt = workspace:FindFirstChild("HoneyCombpressor", true)
+	if prompt then
+		local path = prompt:FindFirstChild("Spout")
+		if path then
+			path = path:FindFirstChild("Jar")
+			if path then
+				path = path:FindFirstChild("HoneyCombpressorPrompt")
+				if path and typeof(fireproximityprompt) == "function" then
+					fireproximityprompt(path)
+					return
+				end
+			end
+		end
+	end
+	warn("❌ No se pudo activar el HoneyCombpressorPrompt exacto.")
+end)
+
+-- Botón: Búsqueda general por "honey"
+local honeyBtn = Instance.new("TextButton")
+honeyBtn.Size = UDim2.new(0.5, -15, 0, 35)
+honeyBtn.Position = UDim2.new(0.5, 5, 0, 52)
 honeyBtn.BackgroundColor3 = hColor
 honeyBtn.TextColor3 = Color3.new(1, 1, 1)
 honeyBtn.Font = Enum.Font.GothamBold
-honeyBtn.TextSize = 14
+honeyBtn.TextSize = 12
 honeyBtn.Text = "🍯Honey Combpressor"
 honeyBtn.BorderSizePixel = 0
 honeyBtn.Parent = menu2
@@ -161,7 +193,6 @@ Instance.new("UICorner", honeyBtn).CornerRadius = UDim.new(0.3, 0)
 applyPressEffect(honeyBtn, hColor)
 
 honeyBtn.MouseButton1Click:Connect(function()
-	-- Busca el primer ProximityPrompt con "Honey" en el nombre
 	local prompt = nil
 	for _, obj in ipairs(workspace:GetDescendants()) do
 		if obj:IsA("ProximityPrompt") and string.find(obj.Name:lower(), "honey") then
@@ -170,17 +201,14 @@ honeyBtn.MouseButton1Click:Connect(function()
 		end
 	end
 
-	if prompt then
-		if typeof(fireproximityprompt) == "function" then
-			fireproximityprompt(prompt)
-		else
-			warn("fireproximityprompt no disponible en este entorno.")
-		end
+	if prompt and typeof(fireproximityprompt) == "function" then
+		fireproximityprompt(prompt)
 	else
-		warn("❌ No se encontró ningún ProximityPrompt con 'Honey' en el nombre.")
+		warn("❌ No se encontró ningún ProximityPrompt con 'Honey' en el nombre o fireproximityprompt no disponible.")
 	end
 end)
 
+-- Mostrar/Ocultar menú
 local visible = false
 menuBtn.MouseButton1Click:Connect(function()
 	visible = not visible
