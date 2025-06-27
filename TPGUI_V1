@@ -112,7 +112,7 @@ for i, info in ipairs(destinos) do
 end
 
 local menu2 = Instance.new("Frame")
-menu2.Size = UDim2.new(0, 280, 0, 110)
+menu2.Size = UDim2.new(0, 280, 0, 145)
 menu2.Position = UDim2.new(0, 390, 0.5, -135)
 menu2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 menu2.Visible = false
@@ -145,16 +145,17 @@ submitAllBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Botón: Recolectar 🍯 (ProximityPrompt específico)
+-- Botón: Recolectar honey
+local hColor = Color3.fromRGB(255, 200, 0)
+
 local honeyPromptBtn = Instance.new("TextButton")
 honeyPromptBtn.Size = UDim2.new(0.5, -15, 0, 35)
 honeyPromptBtn.Position = UDim2.new(0, 10, 0, 52)
-local hColor = Color3.fromRGB(255, 200, 0)
 honeyPromptBtn.BackgroundColor3 = hColor
 honeyPromptBtn.TextColor3 = Color3.new(1, 1, 1)
 honeyPromptBtn.Font = Enum.Font.GothamBold
 honeyPromptBtn.TextSize = 12
-honeyPromptBtn.Text = "Collect honey🍯"
+honeyPromptBtn.Text = "Collect Honey🍯"
 honeyPromptBtn.BorderSizePixel = 0
 honeyPromptBtn.Parent = menu2
 Instance.new("UICorner", honeyPromptBtn).CornerRadius = UDim.new(0.3, 0)
@@ -178,7 +179,6 @@ honeyPromptBtn.MouseButton1Click:Connect(function()
 	warn("❌ No se pudo activar el HoneyCombpressorPrompt exacto.")
 end)
 
--- Botón: Búsqueda general por "honey"
 local honeyBtn = Instance.new("TextButton")
 honeyBtn.Size = UDim2.new(0.5, -15, 0, 35)
 honeyBtn.Position = UDim2.new(0.5, 5, 0, 52)
@@ -200,15 +200,47 @@ honeyBtn.MouseButton1Click:Connect(function()
 			break
 		end
 	end
-
 	if prompt and typeof(fireproximityprompt) == "function" then
 		fireproximityprompt(prompt)
 	else
-		warn("❌ No se encontró ningún ProximityPrompt con 'Honey' en el nombre o fireproximityprompt no disponible.")
+		warn("❌ No se encontró ningún ProximityPrompt con 'Honey' en el nombre.")
 	end
 end)
 
--- Mostrar/Ocultar menú
+-- BOTÓN: Sell Inventory (con teleport temporal al NPC)
+local sellRemote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Sell_Inventory")
+
+local sellBtn = Instance.new("TextButton")
+sellBtn.Size = UDim2.new(1, -20, 0, 35)
+sellBtn.Position = UDim2.new(0, 10, 0, 92)
+sellBtn.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
+sellBtn.TextColor3 = Color3.new(1, 1, 1)
+sellBtn.Font = Enum.Font.GothamBold
+sellBtn.TextSize = 14
+sellBtn.Text = "Sell Inventory"
+sellBtn.BorderSizePixel = 0
+sellBtn.Parent = menu2
+Instance.new("UICorner", sellBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(sellBtn, Color3.fromRGB(255, 85, 85))
+
+sellBtn.MouseButton1Click:Connect(function()
+	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+	if not hrp then
+		warn("No HumanoidRootPart")
+		return
+	end
+
+	local original = hrp.CFrame
+	local npcCFrame = CFrame.new(88.64, 3.00, 0.46) * CFrame.Angles(0, -1.56, 0)
+
+	hrp.CFrame = npcCFrame
+	task.wait(0.5)
+	sellRemote:FireServer()
+	task.wait(0.5)
+	hrp.CFrame = original
+end)
+
+-- Mostrar/ocultar menú
 local visible = false
 menuBtn.MouseButton1Click:Connect(function()
 	visible = not visible
