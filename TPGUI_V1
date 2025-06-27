@@ -122,11 +122,12 @@ makeDraggable(menu2)
 
 local remote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("SummerHarvestRemoteEvent")
 
--- Botón: Submit All Summer Fruits
+-- Botón: Submit All Summer Fruits (loop + STOP)
 local submitAllBtn = Instance.new("TextButton")
 submitAllBtn.Size = UDim2.new(1, -20, 0, 35)
 submitAllBtn.Position = UDim2.new(0, 10, 0, 12)
 local btnColor = Color3.fromRGB(255, 150, 0)
+local stopColor = Color3.fromRGB(255, 85, 85)
 submitAllBtn.BackgroundColor3 = btnColor
 submitAllBtn.TextColor3 = Color3.new(1, 1, 1)
 submitAllBtn.Font = Enum.Font.GothamBold
@@ -135,13 +136,34 @@ submitAllBtn.Text = "Submit All Summer Fruits🌴"
 submitAllBtn.BorderSizePixel = 0
 submitAllBtn.Parent = menu2
 Instance.new("UICorner", submitAllBtn).CornerRadius = UDim.new(0.3, 0)
-applyPressEffect(submitAllBtn, btnColor)
+
+local loopActive = false
+local currentColor = btnColor
+applyPressEffect(submitAllBtn, currentColor)
 
 submitAllBtn.MouseButton1Click:Connect(function()
-	if remote then
-		remote:FireServer("SubmitAllPlants")
+	loopActive = not loopActive
+
+	if loopActive then
+		submitAllBtn.Text = "STOP"
+		currentColor = stopColor
 	else
-		warn("No se encontró SummerHarvestRemoteEvent")
+		submitAllBtn.Text = "Submit All Summer Fruits🌴"
+		currentColor = btnColor
+	end
+
+	submitAllBtn.BackgroundColor3 = currentColor
+	applyPressEffect(submitAllBtn, currentColor)
+
+	if loopActive then
+		task.spawn(function()
+			while loopActive do
+				if remote then
+					remote:FireServer("SubmitAllPlants")
+				end
+				task.wait(0.2)
+			end
+		end)
 	end
 end)
 
@@ -155,7 +177,7 @@ honeyPromptBtn.BackgroundColor3 = hColor
 honeyPromptBtn.TextColor3 = Color3.new(1, 1, 1)
 honeyPromptBtn.Font = Enum.Font.GothamBold
 honeyPromptBtn.TextSize = 12
-honeyPromptBtn.Text = "Collect Honey🍯"
+honeyPromptBtn.Text = "Recolectar 🍯"
 honeyPromptBtn.BorderSizePixel = 0
 honeyPromptBtn.Parent = menu2
 Instance.new("UICorner", honeyPromptBtn).CornerRadius = UDim.new(0.3, 0)
@@ -207,7 +229,7 @@ honeyBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- BOTÓN: Sell Inventory (con teleport temporal al NPC)
+-- BOTÓN: Sell Inventory (teleport temporal)
 local sellRemote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Sell_Inventory")
 
 local sellBtn = Instance.new("TextButton")
