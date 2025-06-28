@@ -1,15 +1,11 @@
--- LocalPlayer y servicios
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
-local playerGui = player:WaitForChild("PlayerGui")
 
--- GUI principal
 local gui = Instance.new("ScreenGui")
 gui.Name = "CustomGUI"
 gui.ResetOnSpawn = false
-gui.Parent = playerGui
+gui.Parent = player:WaitForChild("PlayerGui")
 
--- Función para efecto al presionar botones
 local function applyPressEffect(button, baseColor)
 	button.MouseButton1Down:Connect(function()
 		button.BackgroundColor3 = Color3.new(baseColor.R * 0.85, baseColor.G * 0.85, baseColor.B * 0.85)
@@ -22,7 +18,6 @@ local function applyPressEffect(button, baseColor)
 	end)
 end
 
--- Función para hacer draggable
 local function makeDraggable(guiElement)
 	local dragging = false
 	local dragInput, dragStart, startPos
@@ -58,7 +53,7 @@ local function makeDraggable(guiElement)
 	end)
 end
 
--- Botón de menú
+-- Botón menú
 local menuBtn = Instance.new("TextButton")
 menuBtn.Size = UDim2.new(0, 50, 0, 50)
 menuBtn.Position = UDim2.new(0, 20, 0.5, -25)
@@ -70,10 +65,17 @@ menuBtn.TextColor3 = Color3.new(1, 1, 1)
 menuBtn.BorderSizePixel = 0
 menuBtn.Parent = gui
 Instance.new("UICorner", menuBtn).CornerRadius = UDim.new(0.5, 0)
+
+local visible = false
+menuBtn.MouseButton1Click:Connect(function()
+	visible = not visible
+	menu1.Visible = visible
+	menu2.Visible = visible
+end)
 makeDraggable(menuBtn)
 
--- Menú 1: Teleports
-local menu1 = Instance.new("Frame")
+-- Menú 1
+menu1 = Instance.new("Frame")
 menu1.Size = UDim2.new(0, 280, 0, 270)
 menu1.Position = UDim2.new(0, 90, 0.5, -135)
 menu1.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -118,9 +120,9 @@ for i, info in ipairs(destinos) do
 	end)
 end
 
--- Menú 2: Funcionalidades
-local menu2 = Instance.new("Frame")
-menu2.Size = UDim2.new(0, 280, 0, 175)
+-- Menú 2
+menu2 = Instance.new("Frame")
+menu2.Size = UDim2.new(0, 280, 0, 145)
 menu2.Position = UDim2.new(0, 390, 0.5, -135)
 menu2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 menu2.Visible = false
@@ -130,7 +132,7 @@ makeDraggable(menu2)
 
 local remote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("SummerHarvestRemoteEvent")
 
--- Botón: Submit All Summer Fruits (loop + STOP)
+-- Botón Submit All
 local submitAllBtn = Instance.new("TextButton")
 submitAllBtn.Size = UDim2.new(1, -20, 0, 35)
 submitAllBtn.Position = UDim2.new(0, 10, 0, 12)
@@ -175,7 +177,7 @@ submitAllBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Botón: Recolectar honey
+-- Botones honey
 local hColor = Color3.fromRGB(255, 200, 0)
 
 local honeyPromptBtn = Instance.new("TextButton")
@@ -209,7 +211,6 @@ honeyPromptBtn.MouseButton1Click:Connect(function()
 	warn("❌ No se pudo activar el HoneyCombpressorPrompt exacto.")
 end)
 
--- Botón: Honey Combpressor
 local honeyBtn = Instance.new("TextButton")
 honeyBtn.Size = UDim2.new(0.5, -15, 0, 35)
 honeyBtn.Position = UDim2.new(0.5, 5, 0, 52)
@@ -238,7 +239,7 @@ honeyBtn.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Botón: Sell Inventory
+-- Botón Sell Inventory
 local sellRemote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Sell_Inventory")
 
 local sellBtn = Instance.new("TextButton")
@@ -269,40 +270,4 @@ sellBtn.MouseButton1Click:Connect(function()
 	sellRemote:FireServer()
 	task.wait(0.5)
 	hrp.CFrame = original
-end)
-
--- NUEVO BOTÓN: Honey Shop
-local honeyShopBtn = Instance.new("TextButton")
-honeyShopBtn.Size = UDim2.new(1, -20, 0, 35)
-honeyShopBtn.Position = UDim2.new(0, 10, 0, 132)
-honeyShopBtn.BackgroundColor3 = hColor
-honeyShopBtn.TextColor3 = Color3.new(1, 1, 1)
-honeyShopBtn.Font = Enum.Font.GothamBold
-honeyShopBtn.TextSize = 14
-honeyShopBtn.Text = "Honey Shop 🍯"
-honeyShopBtn.BorderSizePixel = 0
-honeyShopBtn.Parent = menu2
-Instance.new("UICorner", honeyShopBtn).CornerRadius = UDim.new(0.3, 0)
-applyPressEffect(honeyShopBtn, hColor)
-
-local honeyUI = playerGui:WaitForChild("HoneyEventShop_UI")
-local honeyVisible = false
-
-honeyShopBtn.MouseButton1Click:Connect(function()
-	honeyVisible = not honeyVisible
-	honeyUI.Enabled = honeyVisible
-
-	if honeyVisible then
-		honeyShopBtn.Text = "Cerrar Honey Shop ❌"
-	else
-		honeyShopBtn.Text = "Honey Shop 🍯"
-	end
-end)
-
--- Mostrar/ocultar menú
-local visible = false
-menuBtn.MouseButton1Click:Connect(function()
-	visible = not visible
-	menu1.Visible = visible
-	menu2.Visible = visible
 end)
