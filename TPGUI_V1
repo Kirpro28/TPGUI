@@ -1,5 +1,6 @@
 local player = game.Players.LocalPlayer
 local UserInputService = game:GetService("UserInputService")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "CustomGUI"
@@ -7,57 +8,56 @@ gui.ResetOnSpawn = false
 gui.Parent = player:WaitForChild("PlayerGui")
 
 local function applyPressEffect(button, baseColor)
-	button.MouseButton1Down:Connect(function()
-		button.BackgroundColor3 = Color3.new(baseColor.R * 0.85, baseColor.G * 0.85, baseColor.B * 0.85)
-	end)
-	button.MouseButton1Up:Connect(function()
-		button.BackgroundColor3 = baseColor
-	end)
-	button.MouseLeave:Connect(function()
-		button.BackgroundColor3 = baseColor
-	end)
+    button.MouseButton1Down:Connect(function()
+        button.BackgroundColor3 = Color3.new(baseColor.R * 0.85, baseColor.G * 0.85, baseColor.B * 0.85)
+    end)
+    button.MouseButton1Up:Connect(function()
+        button.BackgroundColor3 = baseColor
+    end)
+    button.MouseLeave:Connect(function()
+        button.BackgroundColor3 = baseColor
+    end)
 end
 
 local function makeDraggable(guiElement)
-	local dragging = false
-	local dragInput, dragStart, startPos
+    local dragging = false
+    local dragInput, dragStart, startPos
 
-	guiElement.InputBegan:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseButton1 then
-			dragging = true
-			dragStart = input.Position
-			startPos = guiElement.Position
+    guiElement.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = guiElement.Position
+            input.Changed:Connect(function()
+                if input.UserInputState == Enum.UserInputState.End then
+                    dragging = false
+                end
+            end)
+        end
+    end)
 
-			input.Changed:Connect(function()
-				if input.UserInputState == Enum.UserInputState.End then
-					dragging = false
-				end
-			end)
-		end
-	end)
+    guiElement.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
 
-	guiElement.InputChanged:Connect(function(input)
-		if input.UserInputType == Enum.UserInputType.MouseMovement then
-			dragInput = input
-		end
-	end)
-
-	UserInputService.InputChanged:Connect(function(input)
-		if input == dragInput and dragging then
-			local delta = input.Position - dragStart
-			guiElement.Position = UDim2.new(
-				startPos.X.Scale, startPos.X.Offset + delta.X,
-				startPos.Y.Scale, startPos.Y.Offset + delta.Y
-			)
-		end
-	end)
+    UserInputService.InputChanged:Connect(function(input)
+        if input == dragInput and dragging then
+            local delta = input.Position - dragStart
+            guiElement.Position = UDim2.new(
+                startPos.X.Scale, startPos.X.Offset + delta.X,
+                startPos.Y.Scale, startPos.Y.Offset + delta.Y
+            )
+        end
+    end)
 end
 
--- Botón menú
+-- Botón menú principal (rosa)
 local menuBtn = Instance.new("TextButton")
 menuBtn.Size = UDim2.new(0, 50, 0, 50)
 menuBtn.Position = UDim2.new(0, 20, 0.5, -25)
-menuBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180)
+menuBtn.BackgroundColor3 = Color3.fromRGB(255, 105, 180) -- rosa
 menuBtn.Text = "≡"
 menuBtn.Font = Enum.Font.GothamBold
 menuBtn.TextSize = 28
@@ -67,15 +67,9 @@ menuBtn.Parent = gui
 Instance.new("UICorner", menuBtn).CornerRadius = UDim.new(0.5, 0)
 
 local visible = false
-menuBtn.MouseButton1Click:Connect(function()
-	visible = not visible
-	menu1.Visible = visible
-	menu2.Visible = visible
-end)
-makeDraggable(menuBtn)
 
--- Menú 1
-menu1 = Instance.new("Frame")
+-- Menú 1 (sin cambios)
+local menu1 = Instance.new("Frame")
 menu1.Size = UDim2.new(0, 280, 0, 270)
 menu1.Position = UDim2.new(0, 90, 0.5, -135)
 menu1.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
@@ -85,44 +79,43 @@ Instance.new("UICorner", menu1).CornerRadius = UDim.new(0.1, 0)
 makeDraggable(menu1)
 
 local destinos = {
-	{"Garden 1️⃣", CFrame.new(33.45, 3.00, -57.55)},
-	{"Garden 2️⃣", CFrame.new(33.74, 3.00, 33.02)},
-	{"Garden 3️⃣", CFrame.new(-100.58, 3.00, 30.12)},
-	{"Garden 4️⃣", CFrame.new(-99.62, 3.00, -54.44)},
-	{"Garden 5️⃣", CFrame.new(-236.85, 3.00, 26.37)},
-	{"Garden 6️⃣", CFrame.new(-235.68, 3.00, -52.87)},
-	{"Pets 🐾", CFrame.new(-278.00, 3.00, 7.58)},
-	{"Gear 🔧", CFrame.new(-283.71, 3.00, -13.79)},
-	{"Cosmetics 🎨", CFrame.new(-283.21, 3.00, -31.21)},
-	{"Event 🏟️", CFrame.new(-104.59, 11.89, -7.05)}
+    {"Garden 1️⃣", CFrame.new(33.45, 3.00, -57.55)},
+    {"Garden 2️⃣", CFrame.new(33.74, 3.00, 33.02)},
+    {"Garden 3️⃣", CFrame.new(-100.58, 3.00, 30.12)},
+    {"Garden 4️⃣", CFrame.new(-99.62, 3.00, -54.44)},
+    {"Garden 5️⃣", CFrame.new(-236.85, 3.00, 26.37)},
+    {"Garden 6️⃣", CFrame.new(-235.68, 3.00, -52.87)},
+    {"Pets 🐾", CFrame.new(-278.00, 3.00, 7.58)},
+    {"Gear 🔧", CFrame.new(-283.71, 3.00, -13.79)},
+    {"Cosmetics 🎨", CFrame.new(-283.21, 3.00, -31.21)},
+    {"Event 🏟️", CFrame.new(-104.59, 11.89, -7.05)}
 }
 
 for i, info in ipairs(destinos) do
-	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0, 120, 0, 35)
-	btn.Position = UDim2.new(0, (i <= 5 and 10 or 150), 0, 25 + ((i - 1) % 5) * 42)
-	local color = Color3.fromRGB(255, 105, 180)
-	btn.BackgroundColor3 = color
-	btn.TextColor3 = Color3.new(1, 1, 1)
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 13
-	btn.Text = info[1]
-	btn.BorderSizePixel = 0
-	btn.Parent = menu1
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0.3, 0)
-	applyPressEffect(btn, color)
-
-	btn.MouseButton1Click:Connect(function()
-		local char = player.Character
-		if char and char:FindFirstChild("HumanoidRootPart") then
-			char.HumanoidRootPart.CFrame = info[2]
-		end
-	end)
+    local btn = Instance.new("TextButton")
+    btn.Size = UDim2.new(0, 120, 0, 35)
+    btn.Position = UDim2.new(0, (i <= 5 and 10 or 150), 0, 25 + ((i - 1) % 5) * 42)
+    local color = Color3.fromRGB(255, 105, 180)
+    btn.BackgroundColor3 = color
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamBold
+    btn.TextSize = 13
+    btn.Text = info[1]
+    btn.BorderSizePixel = 0
+    btn.Parent = menu1
+    Instance.new("UICorner", btn).CornerRadius = UDim.new(0.3, 0)
+    applyPressEffect(btn, color)
+    btn.MouseButton1Click:Connect(function()
+        local char = player.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            char.HumanoidRootPart.CFrame = info[2]
+        end
+    end)
 end
 
--- Menú 2
-menu2 = Instance.new("Frame")
-menu2.Size = UDim2.new(0, 280, 0, 145)
+-- Menú 2 (botones nuevos)
+local menu2 = Instance.new("Frame")
+menu2.Size = UDim2.new(0, 280, 0, 180)
 menu2.Position = UDim2.new(0, 390, 0.5, -135)
 menu2.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 menu2.Visible = false
@@ -130,144 +123,132 @@ menu2.Parent = gui
 Instance.new("UICorner", menu2).CornerRadius = UDim.new(0.1, 0)
 makeDraggable(menu2)
 
-local remote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("SummerHarvestRemoteEvent")
+local btnColorBlue = Color3.fromRGB(120, 180, 220)
+local btnColorGreen = Color3.fromRGB(120, 200, 120)
+local btnColorOrange = Color3.fromRGB(255, 150, 0)
+local btnColorRed = Color3.fromRGB(255, 85, 85)
 
--- Botón Submit All
-local submitAllBtn = Instance.new("TextButton")
-submitAllBtn.Size = UDim2.new(1, -20, 0, 35)
-submitAllBtn.Position = UDim2.new(0, 10, 0, 12)
-local btnColor = Color3.fromRGB(255, 150, 0)
-local stopColor = Color3.fromRGB(255, 85, 85)
-submitAllBtn.BackgroundColor3 = btnColor
-submitAllBtn.TextColor3 = Color3.new(1, 1, 1)
-submitAllBtn.Font = Enum.Font.GothamBold
-submitAllBtn.TextSize = 14
-submitAllBtn.Text = "Submit All Summer Fruits🌴"
-submitAllBtn.BorderSizePixel = 0
-submitAllBtn.Parent = menu2
-Instance.new("UICorner", submitAllBtn).CornerRadius = UDim.new(0.3, 0)
-
-local loopActive = false
-local currentColor = btnColor
-applyPressEffect(submitAllBtn, currentColor)
-
-submitAllBtn.MouseButton1Click:Connect(function()
-	loopActive = not loopActive
-
-	if loopActive then
-		submitAllBtn.Text = "STOP"
-		currentColor = stopColor
-	else
-		submitAllBtn.Text = "Submit All Summer Fruits🌴"
-		currentColor = btnColor
-	end
-
-	submitAllBtn.BackgroundColor3 = currentColor
-	applyPressEffect(submitAllBtn, currentColor)
-
-	if loopActive then
-		task.spawn(function()
-			while loopActive do
-				if remote then
-					remote:FireServer("SubmitAllPlants")
-				end
-				task.wait(0.2)
-			end
-		end)
-	end
+-- Dino Quest activa/desactiva UI (celeste)
+local dinoQuestBtn = Instance.new("TextButton")
+dinoQuestBtn.Size = UDim2.new(0.5, -15, 0, 40)
+dinoQuestBtn.Position = UDim2.new(0, 10, 0, 10)
+dinoQuestBtn.BackgroundColor3 = btnColorBlue
+dinoQuestBtn.TextColor3 = Color3.new(1, 1, 1)
+dinoQuestBtn.Font = Enum.Font.GothamBold
+dinoQuestBtn.TextSize = 14
+dinoQuestBtn.Text = "Dino Quest"
+dinoQuestBtn.Parent = menu2
+Instance.new("UICorner", dinoQuestBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(dinoQuestBtn, btnColorBlue)
+dinoQuestBtn.MouseButton1Click:Connect(function()
+    local dinoUI = player.PlayerGui:FindFirstChild("DinoQuests_UI")
+    if dinoUI then
+        dinoUI.Enabled = not dinoUI.Enabled -- toggle
+    else
+        warn("No se encontró DinoQuests_UI")
+    end
 end)
 
--- Botones honey
-local hColor = Color3.fromRGB(255, 200, 0)
-
-local honeyPromptBtn = Instance.new("TextButton")
-honeyPromptBtn.Size = UDim2.new(0.5, -15, 0, 35)
-honeyPromptBtn.Position = UDim2.new(0, 10, 0, 52)
-honeyPromptBtn.BackgroundColor3 = hColor
-honeyPromptBtn.TextColor3 = Color3.new(1, 1, 1)
-honeyPromptBtn.Font = Enum.Font.GothamBold
-honeyPromptBtn.TextSize = 12
-honeyPromptBtn.Text = "Recolectar 🍯"
-honeyPromptBtn.BorderSizePixel = 0
-honeyPromptBtn.Parent = menu2
-Instance.new("UICorner", honeyPromptBtn).CornerRadius = UDim.new(0.3, 0)
-applyPressEffect(honeyPromptBtn, hColor)
-
-honeyPromptBtn.MouseButton1Click:Connect(function()
-	local prompt = workspace:FindFirstChild("HoneyCombpressor", true)
-	if prompt then
-		local path = prompt:FindFirstChild("Spout")
-		if path then
-			path = path:FindFirstChild("Jar")
-			if path then
-				path = path:FindFirstChild("HoneyCombpressorPrompt")
-				if path and typeof(fireproximityprompt) == "function" then
-					fireproximityprompt(path)
-					return
-				end
-			end
-		end
-	end
-	warn("❌ No se pudo activar el HoneyCombpressorPrompt exacto.")
+-- Crafting Table activa/desactiva UI (celeste)
+local craftingBtn = Instance.new("TextButton")
+craftingBtn.Size = UDim2.new(0.5, -15, 0, 40)
+craftingBtn.Position = UDim2.new(0.5, 5, 0, 10)
+craftingBtn.BackgroundColor3 = btnColorBlue
+craftingBtn.TextColor3 = Color3.new(1, 1, 1)
+craftingBtn.Font = Enum.Font.GothamBold
+craftingBtn.TextSize = 14
+craftingBtn.Text = "Crafting Table"
+craftingBtn.Parent = menu2
+Instance.new("UICorner", craftingBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(craftingBtn, btnColorBlue)
+craftingBtn.MouseButton1Click:Connect(function()
+    local recipeUI = player.PlayerGui:FindFirstChild("RecipeSelection_UI")
+    if recipeUI then
+        recipeUI.Enabled = not recipeUI.Enabled -- toggle
+    else
+        warn("No se encontró RecipeSelection_UI")
+    end
 end)
 
-local honeyBtn = Instance.new("TextButton")
-honeyBtn.Size = UDim2.new(0.5, -15, 0, 35)
-honeyBtn.Position = UDim2.new(0.5, 5, 0, 52)
-honeyBtn.BackgroundColor3 = hColor
-honeyBtn.TextColor3 = Color3.new(1, 1, 1)
-honeyBtn.Font = Enum.Font.GothamBold
-honeyBtn.TextSize = 12
-honeyBtn.Text = "🍯Honey Combpressor"
-honeyBtn.BorderSizePixel = 0
-honeyBtn.Parent = menu2
-Instance.new("UICorner", honeyBtn).CornerRadius = UDim.new(0.3, 0)
-applyPressEffect(honeyBtn, hColor)
-
-honeyBtn.MouseButton1Click:Connect(function()
-	local prompt = nil
-	for _, obj in ipairs(workspace:GetDescendants()) do
-		if obj:IsA("ProximityPrompt") and string.find(obj.Name:lower(), "honey") then
-			prompt = obj
-			break
-		end
-	end
-	if prompt and typeof(fireproximityprompt) == "function" then
-		fireproximityprompt(prompt)
-	else
-		warn("❌ No se encontró ningún ProximityPrompt con 'Honey' en el nombre.")
-	end
+-- Claim activa ProximityPrompt (verde)
+local claimBtn = Instance.new("TextButton")
+claimBtn.Size = UDim2.new(0.5, -15, 0, 40)
+claimBtn.Position = UDim2.new(0, 10, 0, 60)
+claimBtn.BackgroundColor3 = btnColorGreen
+claimBtn.TextColor3 = Color3.new(1, 1, 1)
+claimBtn.Font = Enum.Font.GothamBold
+claimBtn.TextSize = 14
+claimBtn.Text = "Claim"
+claimBtn.Parent = menu2
+Instance.new("UICorner", claimBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(claimBtn, btnColorGreen)
+claimBtn.MouseButton1Click:Connect(function()
+    local prompt = nil
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("ProximityPrompt") and obj.Name == "FossilClaimProximityPrompt" then
+            prompt = obj
+            break
+        end
+    end
+    if prompt and typeof(fireproximityprompt) == "function" then
+        fireproximityprompt(prompt)
+    else
+        warn("No se encontró FossilClaimProximityPrompt")
+    end
 end)
 
--- Botón Sell Inventory
-local sellRemote = game:GetService("ReplicatedStorage"):WaitForChild("GameEvents"):WaitForChild("Sell_Inventory")
+-- Give Pet activa función (verde)
+local givePetBtn = Instance.new("TextButton")
+givePetBtn.Size = UDim2.new(0.5, -15, 0, 40)
+givePetBtn.Position = UDim2.new(0.5, 5, 0, 60)
+givePetBtn.BackgroundColor3 = btnColorGreen
+givePetBtn.TextColor3 = Color3.new(1, 1, 1)
+givePetBtn.Font = Enum.Font.GothamBold
+givePetBtn.TextSize = 14
+givePetBtn.Text = "Give Pet"
+givePetBtn.Parent = menu2
+Instance.new("UICorner", givePetBtn).CornerRadius = UDim.new(0.3, 0)
+applyPressEffect(givePetBtn, btnColorGreen)
+givePetBtn.MouseButton1Click:Connect(function()
+    local dinoMachineRE = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("DinoMachineService_RE")
+    dinoMachineRE:FireServer("MachineInteract")
+end)
 
+-- Sell Inventory (rojo)
 local sellBtn = Instance.new("TextButton")
-sellBtn.Size = UDim2.new(1, -20, 0, 35)
-sellBtn.Position = UDim2.new(0, 10, 0, 92)
+sellBtn.Size = UDim2.new(1, -20, 0, 40)
+sellBtn.Position = UDim2.new(0, 10, 0, 110)
 sellBtn.BackgroundColor3 = Color3.fromRGB(255, 85, 85)
 sellBtn.TextColor3 = Color3.new(1, 1, 1)
 sellBtn.Font = Enum.Font.GothamBold
 sellBtn.TextSize = 14
 sellBtn.Text = "Sell Inventory"
-sellBtn.BorderSizePixel = 0
 sellBtn.Parent = menu2
 Instance.new("UICorner", sellBtn).CornerRadius = UDim.new(0.3, 0)
 applyPressEffect(sellBtn, Color3.fromRGB(255, 85, 85))
-
 sellBtn.MouseButton1Click:Connect(function()
-	local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-	if not hrp then
-		warn("No HumanoidRootPart")
-		return
-	end
-
-	local original = hrp.CFrame
-	local npcCFrame = CFrame.new(88.64, 3.00, 0.46) * CFrame.Angles(0, -1.56, 0)
-
-	hrp.CFrame = npcCFrame
-	task.wait(0.5)
-	sellRemote:FireServer()
-	task.wait(0.5)
-	hrp.CFrame = original
+    local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
+    if not hrp then
+        warn("No HumanoidRootPart")
+        return
+    end
+    local original = hrp.CFrame
+    local npcCFrame = CFrame.new(88.64, 3.00, 0.46) * CFrame.Angles(0, -1.56, 0)
+    hrp.CFrame = npcCFrame
+    task.wait(0.5)
+    local sellRemote = ReplicatedStorage:WaitForChild("GameEvents"):WaitForChild("Sell_Inventory")
+    sellRemote:FireServer()
+    task.wait(0.5)
+    hrp.CFrame = original
 end)
+
+-- Alternar menú visible
+menuBtn.MouseButton1Click:Connect(function()
+    visible = not visible
+    menu1.Visible = visible
+    menu2.Visible = visible
+end)
+
+makeDraggable(menuBtn)
+makeDraggable(menu1)
+makeDraggable(menu2)
